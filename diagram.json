@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "author": "upir",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 10, "left": 20, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 245.43,
+      "left": 212.83,
+      "attrs": { "color": "grey", "label": "UP ↑", "key": "ArrowUp" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 312.72,
+      "left": 212.31,
+      "attrs": { "color": "grey", "label": "Select →", "key": "Enter" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn3",
+      "top": 382.36,
+      "left": 212.97,
+      "attrs": { "color": "grey", "label": "Down ↓", "key": "ArrowDown" }
+    },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": 291.14,
+      "left": 19.43,
+      "attrs": { "i2cAddress": "0x3c" }
+    },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 181.1, "left": 441.4, "attrs": {} }
+  ],
+  "connections": [
+    [ "btn1:2.l", "uno:GND.3", "gray", [ "h-12.11", "v-2.76" ] ],
+    [ "btn2:2.l", "uno:GND.3", "gray", [ "h-10.94", "v2.69" ] ],
+    [ "btn3:2.l", "uno:GND.3", "gray", [ "h-11.47", "v0.49" ] ],
+    [ "btn3:1.r", "uno:4", "green", [ "v-0.3", "h77.53", "v-402.39", "h-117.28" ] ],
+    [ "btn2:1.r", "uno:8", "green", [ "v-1.82", "h87.02", "v-336.64", "h-170.77" ] ],
+    [ "btn1:1.r", "uno:12", "green", [ "v-0.29", "h94.85", "v-281.68", "h-212.48" ] ],
+    [ "uno:5V", "oled1:GND", "red", [ "v38.5", "h-122.4" ] ],
+    [ "uno:GND.2", "oled1:VCC", "gray", [ "v48.1", "h-122.45" ] ],
+    [ "uno:A4", "oled1:SDA", "gold", [ "v67.3", "h-179.67" ] ],
+    [ "uno:A5", "oled1:SCL", "violet", [ "v57.7", "h-199" ] ],
+    [ "pot1:VCC", "uno:5V", "red", [ "v48", "h-308", "v9.6" ] ],
+    [ "pot1:GND", "uno:GND.2", "black", [ "v28.8", "h-278.4" ] ],
+    [ "pot1:SIG", "uno:A0", "gold", [ "v38.4", "h-259.6" ] ]
+  ],
+  "dependencies": {}
+}
