@@ -85,38 +85,12 @@ const unsigned char bitmap_item_sel_outline [] PROGMEM = {
 };
 
 
-// 'anim_frame_1', 16x9px
-// spinning inner part of the turbocharher icon, frame 1
-const unsigned char epd_bitmap_anim_frame_1 [] PROGMEM = {
-	0x01, 0x00, 0x09, 0x20, 0x05, 0x40, 0x03, 0x80, 0x1f, 0xf0, 0x03, 0x80, 0x05, 0x40, 0x09, 0x20, 
-	0x01, 0x00
-};
-// 'anim_frame_2', 16x9px
-// spinning inner part of the turbocharher icon, frame 2
-const unsigned char epd_bitmap_anim_frame_2 [] PROGMEM = {
-	0x00, 0x80, 0x04, 0x80, 0x02, 0xa0, 0x1f, 0xc0, 0x03, 0x80, 0x07, 0xf0, 0x0a, 0x80, 0x02, 0x40, 
-	0x02, 0x00
-};
-// 'anim_frame_3', 16x9px
-// spinning inner part of the turbocharher icon, frame 3
-const unsigned char epd_bitmap_anim_frame_3 [] PROGMEM = {
-	0x02, 0x00, 0x02, 0x40, 0x0a, 0x80, 0x07, 0xf0, 0x03, 0x80, 0x1f, 0xc0, 0x02, 0xa0, 0x04, 0x80, 
-	0x00, 0x80
-};
 
-// Array of all bitmaps for convenience. (Total bytes used to store images in PROGMEM = 144)
-const int epd_bitmap_allArray_LEN = 3;
-const unsigned char* epd_bitmap_allArray[3] = {
-	epd_bitmap_anim_frame_1,
-	epd_bitmap_anim_frame_2,
-	epd_bitmap_anim_frame_3
-};
-
-int frame = 0;      // frame for the inner part of the icon
 
 
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
 
+int frame = 0;      // frame for the inner part of the icon
 
 const int NUM_ITEMS = 6; // number of items in the list and also the number of screenshots and screenshots with QR codes (other screens)
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name

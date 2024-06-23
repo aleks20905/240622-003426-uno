@@ -10,4 +10,12 @@ extern const unsigned char bitmap_icon_turbo[];
 
 extern const unsigned char* bitmap_icons[];
 
+
+
+extern const unsigned char epd_bitmap_anim_frame_1 [];
+extern const unsigned char epd_bitmap_anim_frame_2 [];
+extern const unsigned char epd_bitmap_anim_frame_3 [];
+
+extern const unsigned char* epd_bitmap_allArray[];
+
 #endif // ICONS_H
