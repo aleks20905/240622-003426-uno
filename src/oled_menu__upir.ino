@@ -112,12 +112,16 @@ const unsigned char* epd_bitmap_allArray[3] = {
 	epd_bitmap_anim_frame_3
 };
 
+int frame = 0;      // frame for the inner part of the icon
 
 
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
 
+int voltage = 150;
+int amparage = 10;
 
-bool var_Auto_Manual = false;
+
+bool var_Auto_Manual = true;
 int upper_Voltage_Lim = 245;
 int lower_Voltage_Lim = 180;
 int upper_Amparage_Lim = 15;
@@ -130,11 +134,12 @@ const int NUM_ITEMS = 5; // number of items in the list and also the number of s
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name
 
 char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
-  { "Up V Lim " }, 
-  { "Low V Lim" }, 
-  { "Up A lim" },   
-  { "Low A lim" },
+  { "Up Volt Lim " }, 
+  { "Low Volt Lim" }, 
+  { "Up Amp lim" },   
+  { "Low Amp lim" },
   { "history" }
+  // { "info" } // RN valtage + amparage + etc separate menu
 };
 char menu_items_details [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
   { "Upper Voltage Lim " }, 
@@ -149,7 +154,7 @@ int second_menu_items [NUM_ITEMS] = {  // array with item names
   lower_Voltage_Lim, 
   upper_Amparage_Lim ,   
   lower_Amparage_Lim,
-  0 
+  0  // count of errors on the EPROM  len(history)
 };
  
 // note - when changing the order of items above, make sure the other arrays referencing bitmaps
@@ -167,20 +172,21 @@ int button_select_clicked = 0; // same as above
 int button_down_clicked = 0; // same as above
 
 int item_selected = 0; // which item in the menu is selected
-
 int item_sel_previous; // previous item - used in the menu screen to draw the item before the selected one
 int item_sel_next; // next item - used in the menu screen to draw next item after the selected one
 
 int current_screen = 0;   // 0 = menu, 1 = screenshot, 2 = qr
 
 
-int frame = 0;      // frame for the inner part of the icon
+
 
 
 
 char pct[12]; // temporati var to print intgers using itoa()
 
 void setup() {
+  Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
+
   u8g.setColorIndex(1);  // set the color to white
 
   // define pins for buttons
@@ -190,32 +196,18 @@ void setup() {
   pinMode(BUTTON_SELECT_PIN, INPUT_PULLUP); // select button
   pinMode(BUTTON_DOWN_PIN, INPUT_PULLUP); // down button
 
-  pinMode(A0, INPUT);
-
 }
 
 
 void loop() {
 
+  mainCheck();
+
   mainMenuLogic();
 
   secondMenuLogic();
 
-
-
-  if ((digitalRead(BUTTON_SELECT_PIN) == LOW) && (button_select_clicked == 0)) { // select button clicked, jump between screens
-    button_select_clicked = 1; // set button to clicked to only perform the action once
-    if (current_screen == 0) {current_screen = 1;} // menu items screen --> screenshots screen
-    //!  else if (current_screen == 1) {current_screen = 2;} // screenshots screen --> qr codes screen
-    else {current_screen = 0;} // qr codes screen --> menu items screen
-  }
-  if ((digitalRead(BUTTON_SELECT_PIN) == HIGH) && (button_select_clicked == 1)) { button_select_clicked = 0; }// unclick
-
-  // set correct values for the previous and next items
-  item_sel_previous = item_selected - 1;
-  if (item_sel_previous < 0) {item_sel_previous = NUM_ITEMS - 1;} // previous item would be below first = make it the last
-  item_sel_next = item_selected + 1;  
-  if (item_sel_next >= NUM_ITEMS) {item_sel_next = 0;} // next item would be after last = make it the first
+  selectButtonLogic();
 
 
   u8g.firstPage(); // required for page drawing mode for u8g library
@@ -251,22 +243,22 @@ void drawMenu() {
 
     // draw previous item as icon + label
     u8g.setFont(u8g_font_7x14);
-    u8g.drawStr(25, 15, menu_items[item_sel_previous]);  // draw the var Name 
-    u8g.drawStr(128-26, 15, itoa(second_menu_items[item_sel_previous] , pct, 10)); //! draw the value 
-    u8g.drawBitmapP( 4, 2, 16/8, 16, bitmap_icons[item_sel_previous]); 
+    u8g.drawStr(4, 15, menu_items[item_sel_previous]);  // draw the var Name 
+    u8g.drawStr(128-28, 15, itoa(second_menu_items[item_sel_previous] , pct, 10)); //! draw the value 
+    // u8g.drawBitmapP( 4, 2, 16/8, 16, bitmap_icons[item_sel_previous]); 
     
 
     // draw selected item as icon + label in bold font
     u8g.setFont(u8g_font_7x14B);    
-    u8g.drawStr(25, 15+20+2, menu_items[item_selected]);   
-    u8g.drawStr(128-26, 15+20+2, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
-    u8g.drawBitmapP( 4, 24, 16/8, 16, bitmap_icons[item_selected]);  
+    u8g.drawStr(4, 15+20+2, menu_items[item_selected]);   
+    u8g.drawStr(128-28, 15+20+2, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
+    // u8g.drawBitmapP( 4, 24, 16/8, 16, bitmap_icons[item_selected]);  
 
     // draw next item as icon + label
     u8g.setFont(u8g_font_7x14);     
-    u8g.drawStr(25, 15+20+20+2+2, menu_items[item_sel_next]);   
-    u8g.drawStr(128-26, 15+20+20+2+2, itoa(second_menu_items[item_sel_next] , pct, 10)); //! draw the value 
-    u8g.drawBitmapP( 4, 46, 16/8, 16, bitmap_icons[item_sel_next]); 
+    u8g.drawStr(4, 15+20+20+2+2, menu_items[item_sel_next]);   
+    u8g.drawStr(128-28, 15+20+20+2+2, itoa(second_menu_items[item_sel_next] , pct, 10)); //! draw the value 
+    // u8g.drawBitmapP( 4, 46, 16/8, 16, bitmap_icons[item_sel_next]); 
 
     // draw scrollbar background
     u8g.drawBitmapP(128-8, 0, 8/8, 64, bitmap_scrollbar_background);
@@ -395,3 +387,106 @@ void secondMenuLogic(){
   } //TODO replace the hole logic with rotary encoder
 
 }
+
+void selectButtonLogic(){
+
+  if ((digitalRead(BUTTON_SELECT_PIN) == LOW) && (button_select_clicked == 0)) { // select button clicked, jump between screens
+    button_select_clicked = 1; // set button to clicked to only perform the action once
+    if (current_screen == 0) {current_screen = 1;} // menu items screen --> screenshots screen
+    //!  else if (current_screen == 1) {current_screen = 2;} // screenshots screen --> qr codes screen
+    else {current_screen = 0;} // qr codes screen --> menu items screen
+  }
+  if ((digitalRead(BUTTON_SELECT_PIN) == HIGH) && (button_select_clicked == 1)) { button_select_clicked = 0; }// unclick
+
+  // set correct values for the previous and next items
+  item_sel_previous = item_selected - 1;
+  if (item_sel_previous < 0) {item_sel_previous = NUM_ITEMS - 1;} // previous item would be below first = make it the last
+  item_sel_next = item_selected + 1;  
+  if (item_sel_next >= NUM_ITEMS) {item_sel_next = 0;} // next item would be after last = make it the first
+
+}
+
+unsigned long ampHigherStartTime = 0;
+unsigned long ampLowerStartTime = 0;
+unsigned long voltageHigherStartTime = 0;
+unsigned long voltageLowerStartTime = 0;
+
+const unsigned long timeThreshold = 5000;
+
+void mainCheck(){
+  if (var_Auto_Manual) { // ##################checks only when in auto mode################## 
+
+    if (checkAmpHigher())     { Serial.print("amp higher "); }
+    if (checkAmpLower())      { Serial.print("amp lower "); }
+    if (checkVoltageHigher()) { Serial.print("voltage higher "); }
+    if (checkVoltageLower())  { Serial.print("voltage lower "); }
+
+
+
+
+
+  } // ##################checks only when in auto mode################## 
+
+  else{ // ##################checks only when in manual mode################## 
+
+  }// ##################checks only when in manual mode################## 
+
+  // ##################imporntant check that happens all the time################## 
+
+  // ##################imporntant check that happens all the time################## 
+}
+
+bool checkAmpHigher() {
+  if (amparage > second_menu_items[2]) {
+    if (ampHigherStartTime == 0) { ampHigherStartTime = millis(); } 
+    
+    else if (millis() - ampHigherStartTime >= timeThreshold) {
+      ampHigherStartTime = 0; // Reset the timer // todo can remove it to get all the panic all the time 
+      return true;
+    }
+  }
+  else { ampHigherStartTime = 0; } // Reset the timer if condition is not met
+  return false;
+}
+
+bool checkAmpLower() {
+  if (amparage < second_menu_items[3]) {
+    if (ampLowerStartTime == 0) { ampLowerStartTime = millis(); }
+    
+    else if (millis() - ampLowerStartTime >= timeThreshold) {
+      ampLowerStartTime = 0; // Reset the timer // todo can remove it to get all the panic all the time 
+      return true;
+    }
+  } 
+  else { ampLowerStartTime = 0; } // Reset the timer if condition is not met
+  return false;
+}
+
+bool checkVoltageHigher() {
+  if (voltage > second_menu_items[0]) {
+    if (voltageHigherStartTime == 0) { voltageHigherStartTime = millis(); }
+    
+    else if (millis() - voltageHigherStartTime >= timeThreshold) {
+      voltageHigherStartTime = 0; // Reset the timer // todo can remove it to get all the panic all the time 
+      return true;
+    }
+  } 
+  else { voltageHigherStartTime = 0; } // Reset the timer if condition is not met
+  return false;
+}
+
+bool checkVoltageLower() {
+  if (voltage < second_menu_items[1]) {
+    if (voltageLowerStartTime == 0) { voltageLowerStartTime = millis(); }
+    
+    else if (millis() - voltageLowerStartTime >= timeThreshold) {
+      voltageLowerStartTime = 0; // Reset the timer // todo can remove it to get all the panic all the time 
+      return true;
+    }
+  } 
+  else { voltageLowerStartTime = 0; } // Reset the timer if condition is not met
+  return false;
+}
+
+
+
