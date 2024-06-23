@@ -121,11 +121,11 @@ int history_sel_next; // next item - used in the menu screen to draw next item a
 
 const int MAX_HISTORY_LEN = 5;
 const char history [MAX_HISTORY_LEN] [20] = {  // array with item names
-  { "Amp hight " }, 
-  { "Amp low" }, 
-  { "unknow err" },   
-  { "idk" },   
-  { "someting" }
+  { "Amp hight fake" }, 
+  { "Amp low fake" }, 
+  { "unknow fake" },   
+  { "idk fake" },   
+  { "fake" }
 };
 
 
@@ -175,7 +175,7 @@ int current_screen = 0;   // 0 = menu, 1 = screenshot, 2 = qr
 
 
 
-char pct[12]; // temporati var to print intgers using itoa()
+char pct[5]; // temporati var to print intgers using itoa()
 
 void setup() {
   Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
@@ -274,6 +274,14 @@ void drawMenu() {
     else {
       u8g.drawStr(128-16, 15+20+20+2+2+2, "Off"); 
     }
+
+
+  // u8g.drawRFrame(0, 28, 128, 18, 4); // selected 
+  // u8g.drawFrame(0, 46, 128, 18); //previus selected
+  // u8g.drawFrame(0, 10, 128, 18); // next selected
+  // u8g.setFont(u8g_font_6x12);
+  // u8g.drawStr(1, 8, "230V"); // value 1 
+  // u8g.drawStr(34, 8, "15.2A"); // value 2 
     
 }
 
