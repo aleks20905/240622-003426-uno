@@ -32,22 +32,21 @@
       "left": 19.43,
       "attrs": { "i2cAddress": "0x3c" }
     },
-    { "type": "wokwi-potentiometer", "id": "pot1", "top": 181.1, "left": 441.4, "attrs": {} }
+    { "type": "wokwi-slide-switch", "id": "sw1", "top": 186.8, "left": 406.3, "attrs": {} }
   ],
   "connections": [
     [ "btn1:2.l", "uno:GND.3", "gray", [ "h-12.11", "v-2.76" ] ],
     [ "btn2:2.l", "uno:GND.3", "gray", [ "h-10.94", "v2.69" ] ],
     [ "btn3:2.l", "uno:GND.3", "gray", [ "h-11.47", "v0.49" ] ],
-    [ "btn3:1.r", "uno:4", "green", [ "v-0.3", "h77.53", "v-402.39", "h-117.28" ] ],
-    [ "btn2:1.r", "uno:8", "green", [ "v-1.82", "h87.02", "v-336.64", "h-170.77" ] ],
-    [ "btn1:1.r", "uno:12", "green", [ "v-0.29", "h94.85", "v-281.68", "h-212.48" ] ],
+    [ "btn3:1.r", "uno:4", "green", [ "v-0.3", "h27.23", "v-395.06", "h-69.7" ] ],
+    [ "btn2:1.r", "uno:8", "green", [ "v-1.82", "h47.09", "v-336.64", "h-133.4" ] ],
+    [ "btn1:1.r", "uno:12", "green", [ "v-0.29", "h65.77", "v-281.68", "h-191.1" ] ],
     [ "uno:5V", "oled1:GND", "red", [ "v38.5", "h-122.4" ] ],
     [ "uno:GND.2", "oled1:VCC", "gray", [ "v48.1", "h-122.45" ] ],
     [ "uno:A4", "oled1:SDA", "gold", [ "v67.3", "h-179.67" ] ],
     [ "uno:A5", "oled1:SCL", "violet", [ "v57.7", "h-199" ] ],
-    [ "pot1:VCC", "uno:5V", "red", [ "v48", "h-308", "v9.6" ] ],
-    [ "pot1:GND", "uno:GND.2", "black", [ "v28.8", "h-278.4" ] ],
-    [ "pot1:SIG", "uno:A0", "gold", [ "v38.4", "h-259.6" ] ]
+    [ "sw1:2", "uno:GND.3", "gray", [ "v76.8", "h-220.7" ] ],
+    [ "sw1:3", "uno:2", "violet", [ "v38.4", "h-57.4", "v-297.6", "h-19.2" ] ]
   ],
   "dependencies": {}
 }

@@ -117,23 +117,11 @@ int frame = 0;      // frame for the inner part of the icon
 
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
 
-int voltage = 150;
-int amparage = 10;
-
-
-bool var_Auto_Manual = true;
-int upper_Voltage_Lim = 245;
-int lower_Voltage_Lim = 180;
-int upper_Amparage_Lim = 15;
-int lower_Amparage_Lim =  6;
-
-
-
 
 const int NUM_ITEMS = 5; // number of items in the list and also the number of screenshots and screenshots with QR codes (other screens)
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name
 
-char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
+const char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
   { "Up Volt Lim " }, 
   { "Low Volt Lim" }, 
   { "Up Amp lim" },   
@@ -141,13 +129,25 @@ char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
   { "history" }
   // { "info" } // RN valtage + amparage + etc separate menu
 };
-char menu_items_details [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
+const char menu_items_details [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
   { "Upper Voltage Lim " }, 
   { "Lower Voltage Lim" }, 
   { "Upper Amp lim" },   
   { "Lower Amp lim" },
   { "in construction..." }
 };
+
+
+
+int voltage = 150;
+int amparage = 10;
+
+bool var_Auto_Manual = true;
+int upper_Voltage_Lim = 245;
+int lower_Voltage_Lim = 180;
+int upper_Amparage_Lim = 15;
+int lower_Amparage_Lim =  6;
+
 
 int second_menu_items [NUM_ITEMS] = {  // array with item names
   upper_Voltage_Lim, 
@@ -188,6 +188,9 @@ void setup() {
   Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
 
   u8g.setColorIndex(1);  // set the color to white
+
+
+  pinMode(2, INPUT_PULLUP);
 
   // define pins for buttons
   // INPUT_PULLUP means the button is HIGH when not pressed, and LOW when pressed
@@ -414,6 +417,7 @@ unsigned long voltageLowerStartTime = 0;
 const unsigned long timeThreshold = 5000;
 
 void mainCheck(){
+  var_Auto_Manual = digitalRead(2) == HIGH;
   if (var_Auto_Manual) { // ##################checks only when in auto mode################## 
 
     if (checkAmpHigher())     { Serial.print("amp higher "); }
