@@ -118,13 +118,14 @@ int frame = 0;      // frame for the inner part of the icon
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
 
 
-const int NUM_ITEMS = 5; // number of items in the list and also the number of screenshots and screenshots with QR codes (other screens)
+const int NUM_ITEMS = 6; // number of items in the list and also the number of screenshots and screenshots with QR codes (other screens)
 const int MAX_ITEM_LENGTH = 20; // maximum characters for the item name
 
 const char menu_items [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with item names
   { "Up Volt Lim " }, 
   { "Low Volt Lim" }, 
   { "Up Amp lim" },   
+  { "UpSoftAmp lim" },
   { "Low Amp lim" },
   { "history" }
   // { "info" } // RN valtage + amparage + etc separate menu
@@ -133,26 +134,29 @@ const char menu_items_details [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with i
   { "Upper Voltage Lim " }, 
   { "Lower Voltage Lim" }, 
   { "Upper Amp lim" },   
+  { "Upper softAmp lim" },   
   { "Lower Amp lim" },
   { "in construction..." }
 };
 
 
 
-int voltage = 150;
+int voltage = 190;
 int amparage = 10;
 
 bool var_Auto_Manual = true;
 int upper_Voltage_Lim = 245;
 int lower_Voltage_Lim = 180;
 int upper_Amparage_Lim = 15;
+int upper_Soft_Amparage_Lim = 11;
 int lower_Amparage_Lim =  6;
 
 
 int second_menu_items [NUM_ITEMS] = {  // array with item names
   upper_Voltage_Lim, 
   lower_Voltage_Lim, 
-  upper_Amparage_Lim ,   
+  upper_Amparage_Lim ,  
+  upper_Soft_Amparage_Lim, 
   lower_Amparage_Lim,
   0  // count of errors on the EPROM  len(history)
 };
@@ -410,17 +414,20 @@ void selectButtonLogic(){
 }
 
 unsigned long ampHigherStartTime = 0;
+unsigned long ampSoftHigherStartTime = 0;
 unsigned long ampLowerStartTime = 0;
 unsigned long voltageHigherStartTime = 0;
 unsigned long voltageLowerStartTime = 0;
 
 const unsigned long timeThreshold = 5000;
+const unsigned long softTimeThreshold = 10000;
 
 void mainCheck(){
   var_Auto_Manual = digitalRead(2) == HIGH;
   if (var_Auto_Manual) { // ##################checks only when in auto mode################## 
 
     if (checkAmpHigher())     { Serial.print("amp higher "); }
+    if (checkSoftAmpHigher()) { Serial.print("soft amp higher "); }
     if (checkAmpLower())      { Serial.print("amp lower "); }
     if (checkVoltageHigher()) { Serial.print("voltage higher "); }
     if (checkVoltageLower())  { Serial.print("voltage lower "); }
@@ -453,8 +460,21 @@ bool checkAmpHigher() {
   return false;
 }
 
+bool checkSoftAmpHigher() {
+  if (amparage > second_menu_items[3]) {
+    if (ampSoftHigherStartTime == 0) { ampSoftHigherStartTime = millis(); } 
+    
+    else if (millis() - ampSoftHigherStartTime >= softTimeThreshold) {
+      ampSoftHigherStartTime = 0; // Reset the timer // todo can remove it to get all the panic all the time 
+      return true;
+    }
+  }
+  else { ampSoftHigherStartTime = 0; } // Reset the timer if condition is not met
+  return false;
+}
+
 bool checkAmpLower() {
-  if (amparage < second_menu_items[3]) {
+  if (amparage < second_menu_items[4]) {
     if (ampLowerStartTime == 0) { ampLowerStartTime = millis(); }
     
     else if (millis() - ampLowerStartTime >= timeThreshold) {
