@@ -115,6 +115,21 @@ const char menu_items_details [NUM_ITEMS] [MAX_ITEM_LENGTH] = {  // array with i
 
 
 
+int history_selected = 0;
+int history_sel_previous; // previous item - used in the menu screen to draw the item before the selected one
+int history_sel_next; // next item - used in the menu screen to draw next item after the selected one
+
+const int MAX_HISTORY_LEN = 5;
+const char history [MAX_HISTORY_LEN] [20] = {  // array with item names
+  { "Amp hight " }, 
+  { "Amp low" }, 
+  { "unknow err" },   
+  { "idk" },   
+  { "someting" }
+};
+
+
+
 int voltage = 190;
 int amparage = 10;
 
@@ -199,8 +214,11 @@ void loop() {
       drawMenu(); //! Draw the main menu
     } 
     else if (current_screen == 1) { // SCREENSHOTS SCREEN
+      if(item_selected == 5){
+        drawHistory();
 
-      drawVar(); // draw screenshot
+      }   
+      else { drawVar(); }  // draw selected info 
     }
     //! else if (current_screen == 2) { // QR SCREEN
     //     u8g.drawBitmapP( 0, 0, 128/8, 64, bitmap_qr_codes[item_selected]); // draw qr code screenshot
@@ -302,6 +320,33 @@ void drawVar() {
   
 }
 
+void drawInfo(){}
+
+void drawHistory(){
+  // selected item background
+  u8g.drawBitmapP(0, 22, 128/8, 21, bitmap_item_sel_outline);
+
+  // draw previous item as icon + label
+  u8g.setFont(u8g_font_7x14);
+  u8g.drawStr(4, 15, history[history_sel_previous]);  // draw the var Name 
+  
+  // draw selected item as icon + label in bold font
+  u8g.setFont(u8g_font_7x14B);    
+  u8g.drawStr(4, 15+20+2, history[history_selected]);   
+
+  // draw next item as icon + label
+  u8g.setFont(u8g_font_7x14);     
+  u8g.drawStr(4, 15+20+20+2+2, history[history_sel_next]);   
+  // draw scrollbar background
+  u8g.drawBitmapP(128-8, 0, 8/8, 64, bitmap_scrollbar_background);
+
+  // draw scrollbar handle
+  u8g.drawBox(125, 64/MAX_HISTORY_LEN * history_selected, 3, 64/MAX_HISTORY_LEN); 
+
+  
+
+}
+
 void mainMenuLogic(){
   if (current_screen == 0) { // MENU SCREEN  //TODO replace the hole logic with rotary encoder
 
@@ -332,7 +377,31 @@ void mainMenuLogic(){
 
 }
 
+
+
 void secondMenuLogic(){
+
+  if (current_screen == 1 && item_selected == 5) { // MENU SCREEN  //TODO replace the hole logic with rotary encoder
+
+    if ((digitalRead(BUTTON_UP_PIN) == LOW) && (button_up_clicked == 0)) { // up button clicked - jump to previous menu item
+      history_selected = history_selected - 1; // select previous item
+      button_up_clicked = 1; // set button to clicked to only perform the action once
+
+      if (history_selected < 0) { history_selected = MAX_HISTORY_LEN-1; }
+    }
+    else if ((digitalRead(BUTTON_DOWN_PIN) == LOW) && (button_down_clicked == 0)) { // down button clicked - jump to next menu item
+      history_selected = history_selected + 1; // select next item
+      button_down_clicked = 1; // set button to clicked to only perform the action once
+
+      if (history_selected >= MAX_HISTORY_LEN) { history_selected = 0; }
+    } 
+
+    if ((digitalRead(BUTTON_UP_PIN) == HIGH) && (button_up_clicked == 1)) {   button_up_clicked = 0; }// unclick
+    if ((digitalRead(BUTTON_DOWN_PIN) == HIGH) && (button_down_clicked == 1)) { button_down_clicked = 0; } // unclick   
+
+  } //TODO replace the hole logic with rotary encoder
+  
+
   if (current_screen == 1) { //TODO replace the hole logic with rotary encoder
 
     // up and down buttons only work for the menu screen
@@ -367,6 +436,7 @@ void secondMenuLogic(){
 
   } //TODO replace the hole logic with rotary encoder
 
+
 }
 
 void selectButtonLogic(){
@@ -384,6 +454,13 @@ void selectButtonLogic(){
   if (item_sel_previous < 0) {item_sel_previous = NUM_ITEMS - 1;} // previous item would be below first = make it the last
   item_sel_next = item_selected + 1;  
   if (item_sel_next >= NUM_ITEMS) {item_sel_next = 0;} // next item would be after last = make it the first
+
+
+  // set correct values for the previous and next items
+  history_sel_previous = history_selected - 1;
+  if (history_sel_previous < 0) {history_sel_previous = MAX_HISTORY_LEN - 1;} // previous item would be below first = make it the last
+  history_sel_next = history_selected + 1;  
+  if (history_sel_next >= MAX_HISTORY_LEN) {history_sel_next = 0;} // next item would be after last = make it the first
 
 }
 
