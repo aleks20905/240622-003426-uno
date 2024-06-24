@@ -197,6 +197,7 @@ void setup() {
 
 void loop() {
 
+
   mainCheck();
 
   mainMenuLogic();
@@ -205,15 +206,16 @@ void loop() {
 
   selectButtonLogic();
 
+  
 
   u8g.firstPage(); // required for page drawing mode for u8g library
   do {
-
+    drawTopPanel();
     if (current_screen == 0) { // MENU SCREEN
 
       drawMenu(); //! Draw the main menu
     } 
-    else if (current_screen == 1) { // SCREENSHOTS SCREEN
+    else if (current_screen == 1) { // second SCREEN
       if(item_selected == 5){
         drawHistory();
 
@@ -236,96 +238,75 @@ void loop() {
   
 }
 
+void drawTopPanel(){
+
+  // top  #####
+  u8g.setFont(u8g_font_6x12);
+  u8g.drawStr(1, 8, "230V"); // value 1 
+  u8g.drawStr(34, 8, "15.2A"); // value 2 
+  //top ####
+
+  // draw the animated inside part of the icon
+  u8g.drawBitmapP(128-36, 0, 16/8, 9, epd_bitmap_allArray[frame]);   
+
+  // draw auto / manual
+  u8g.setFont(u8g_font_4x6);
+  if(var_Auto_Manual){  u8g.drawStr(128-22, 7, "auto");   }
+  else { u8g.drawStr(128-22, 7, "---");  }
+
+}
+
 void drawMenu() {
-    // selected item background
-    u8g.drawBitmapP(0, 22, 128/8, 21, bitmap_item_sel_outline);
 
-    // draw previous item as icon + label
-    u8g.setFont(u8g_font_7x14);
-    u8g.drawStr(4, 15, menu_items[item_sel_previous]);  // draw the var Name 
-    u8g.drawStr(128-28, 15, itoa(second_menu_items[item_sel_previous] , pct, 10)); //! draw the value 
-    // u8g.drawBitmapP( 4, 2, 16/8, 16, bitmap_icons[item_sel_previous]); 
-    
+  // draw scrollbar background
+  u8g.drawBitmapP(128-8, 0, 8/8, 64, bitmap_scrollbar_background);
 
-    // draw selected item as icon + label in bold font
-    u8g.setFont(u8g_font_7x14B);    
-    u8g.drawStr(4, 15+20+2, menu_items[item_selected]);   
-    u8g.drawStr(128-28, 15+20+2, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
-    // u8g.drawBitmapP( 4, 24, 16/8, 16, bitmap_icons[item_selected]);  
-
-    // draw next item as icon + label
-    u8g.setFont(u8g_font_7x14);     
-    u8g.drawStr(4, 15+20+20+2+2, menu_items[item_sel_next]);   
-    u8g.drawStr(128-28, 15+20+20+2+2, itoa(second_menu_items[item_sel_next] , pct, 10)); //! draw the value 
-    // u8g.drawBitmapP( 4, 46, 16/8, 16, bitmap_icons[item_sel_next]); 
-
-    // draw scrollbar background
-    u8g.drawBitmapP(128-8, 0, 8/8, 64, bitmap_scrollbar_background);
-
-    // draw scrollbar handle
-    u8g.drawBox(125, 64/NUM_ITEMS * item_selected, 3, 64/NUM_ITEMS); 
+  // draw scrollbar handle
+  u8g.drawBox(125, 64/NUM_ITEMS * item_selected, 3, 64/NUM_ITEMS); 
 
 
-    // draw upir logo
-    u8g.setFont(u8g_font_4x6);
-    if(var_Auto_Manual){ 
-      u8g.drawStr(128-16, 15+20+20+2+2+2, "On");  
-    }
-    else {
-      u8g.drawStr(128-16, 15+20+20+2+2+2, "Off"); 
-    }
+  
+
+  
+  //u8g.drawFrame(0, 10, 128, 18); // next selected
+  u8g.setFont(u8g_font_7x14);
+  u8g.drawStr(4, 43-18, menu_items[item_sel_previous]);  // draw the var Name 
+  u8g.drawStr(128-28, 43-18, itoa(second_menu_items[item_sel_previous] , pct, 10)); //! draw the value 
+
+  u8g.drawRFrame(0, 28, 124, 18, 4); // selected 
+  u8g.drawLine(5,46,118,46);      // ? can be remove for flash saving
+  u8g.setFont(u8g_font_7x14B);    // ? can be changed to u8g_font_7x14 for flash saving
+  u8g.drawStr(4, 43, menu_items[item_selected]);   
+  u8g.drawStr(128-28, 43, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
+
+  //u8g.drawFrame(0, 46, 128, 18); //previus selected
+  u8g.setFont(u8g_font_7x14);     
+  u8g.drawStr(4, 43 + 18, menu_items[item_sel_next]);   
+  u8g.drawStr(128-28, 43 + 18, itoa(second_menu_items[item_sel_next] , pct, 10)); //! draw the value 
 
 
-  // u8g.drawRFrame(0, 28, 128, 18, 4); // selected 
-  // u8g.drawFrame(0, 46, 128, 18); //previus selected
-  // u8g.drawFrame(0, 10, 128, 18); // next selected
-  // u8g.setFont(u8g_font_6x12);
-  // u8g.drawStr(1, 8, "230V"); // value 1 
-  // u8g.drawStr(34, 8, "15.2A"); // value 2 
+
+
     
 }
 
 void drawVar() {
 
+  u8g.setColorIndex(1); // white color
 
-    // draw selected item as icon + label in bold font
-    // u8g.setFont(u8g_font_7x14B);    
-    // u8g.drawStr(25, 15+20+2, menu_items[item_selected]);   
-    // u8g.drawBitmapP( 4, 24, 16/8, 16, bitmap_icons[item_selected]);   
+  u8g.setFont(u8g_font_7x14);
+  u8g.drawStr(4, 16+16, menu_items_details[item_selected]); 
 
-    u8g.setColorIndex(1); // white color
-
-    u8g.setFont(u8g_font_7x14);
-    u8g.drawStr(4, 16+16, menu_items_details[item_selected]); 
-
-    // u8g.drawStr(128-26, 16+16, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
+  // u8g.drawStr(128-26, 16+16, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
 
    
-    u8g.drawStr(4, 16+16+16, itoa(second_menu_items[item_selected] , pct, 10)); 
-    // u8g.drawStr(4, 16+16+16, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
+  u8g.drawStr(4, 16+16+16, itoa(second_menu_items[item_selected] , pct, 10)); 
+  // u8g.drawStr(4, 16+16+16, itoa(second_menu_items[item_selected] , pct, 10)); //! draw the value 
 
 
-    //u8g.setColorIndex(0);                                    // black color      
-    //u8g.drawBox(1, 12, 126, 12);                             // rectangle covering the fullscreen background
-    u8g.setColorIndex(1);                                      // white color   
-
-    u8g.drawFrame(0, 5, 128, 15);
-    //u8g.drawBox(2,5+2, map(progress, 150, 300, 0, 124), 10);    // actual gauge fill, remapped from 0-1023 to 0-124 (maximum rectangle size)
+  // u8g.drawFrame(0, 5, 128, 15);
+  //u8g.drawBox(2,5+2, map(progress, 150, 300, 0, 124), 10);    // actual gauge fill, remapped from 0-1023 to 0-124 (maximum rectangle size)
     
-
-
-
-
-    // draw the animated inside part of the icon
-    u8g.drawBitmapP(128-16, 64-16, 16/8, 9, epd_bitmap_allArray[frame]);   
-
-  
-
-
-    u8g.setFont(u8g_font_4x6);
-    if(var_Auto_Manual){  u8g.drawStr(128-16, 15+20+20+2+2+2, "On");  }
-    else { u8g.drawStr(128-16, 15+20+20+2+2+2, "Off"); }
-  
 }
 
 void drawInfo(){}
