@@ -3,15 +3,8 @@
 
 #include <avr/pgmspace.h>
 
-extern const unsigned char bitmap_icon_dashboard[];
-extern const unsigned char bitmap_icon_gps_speed[];
-extern const unsigned char bitmap_icon_knob_over_oled[];
-extern const unsigned char bitmap_icon_turbo[];
 
 extern const unsigned char image_operation_warning_bits[];
-
-extern const unsigned char* bitmap_icons[];
-
 
 
 extern const unsigned char epd_bitmap_anim_frame_1 [];
