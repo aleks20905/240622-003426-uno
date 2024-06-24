@@ -240,11 +240,18 @@ void loop() {
 
 void drawTopPanel(){
 
-  // top  #####
   u8g.setFont(u8g_font_6x12);
-  u8g.drawStr(1, 8, "230V"); // value 1 
-  u8g.drawStr(34, 8, "15.2A"); // value 2 
-  //top ####
+  
+  u8g.drawStr(1, 8, itoa(voltage , pct, 10)); // value 1 
+  u8g.drawStr(1+12+6, 8, "V"); // value 1 
+
+  
+  u8g.drawStr(34, 8, itoa(amparage , pct, 10)); // value 2 
+  u8g.drawStr(34+12, 8, ".0A"); // value 2 
+
+
+  u8g.drawXBMP(128-38, 0, 2, 8, image_operation_warning_bits); // exclamation mark 
+
 
   // draw the animated inside part of the icon
   u8g.drawBitmapP(128-36, 0, 16/8, 9, epd_bitmap_allArray[frame]);   
