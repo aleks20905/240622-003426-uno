@@ -85,8 +85,9 @@ const unsigned char bitmap_item_sel_outline [] PROGMEM = {
 };
 
 
-
-
+unsigned long timeout = 0;
+const unsigned long timeoutDuration = 20000; // Timeout duration in milliseconds (e.g., 20 seconds)
+bool working = false;
 
 // ------------------ end generated bitmaps from image2cpp ---------------------------------
 
@@ -172,9 +173,6 @@ int current_screen = 0;   // 0 = menu, 1 = screenshot, 2 = qr
 
 
 
-
-
-
 char pct[5]; // temporati var to print intgers using itoa()
 
 void setup() {
@@ -253,8 +251,10 @@ void drawTopPanel(){
   u8g.drawXBMP(128-38, 0, 2, 8, image_operation_warning_bits); // exclamation mark 
 
 
-  // draw the animated inside part of the icon
-  u8g.drawBitmapP(128-36, 0, 16/8, 9, epd_bitmap_allArray[frame]);   
+  // draw the animated rotor
+  if (working){u8g.drawBitmapP(128-36, 0, 16/8, 9, epd_bitmap_allArray[frame]); }
+  else {u8g.drawBitmapP(128-36, 0, 16/8, 9, epd_bitmap_allArray[0]); }
+    
 
   // draw auto / manual
   u8g.setFont(u8g_font_4x6);
@@ -471,13 +471,17 @@ const unsigned long softTimeThreshold = 10000;
 
 void mainCheck(){
   var_Auto_Manual = digitalRead(2) == HIGH;
+  unsigned long currentTime = millis();
+  bool problemDetected = false;
   if (var_Auto_Manual) { // ##################checks only when in auto mode################## 
+  
+    
 
-    if (checkAmpHigher())     { Serial.print("amp higher "); }
-    if (checkSoftAmpHigher()) { Serial.print("soft amp higher "); }
-    if (checkAmpLower())      { Serial.print("amp lower "); }
-    if (checkVoltageHigher()) { Serial.print("voltage higher "); }
-    if (checkVoltageLower())  { Serial.print("voltage lower "); }
+    if (checkAmpHigher())     { Serial.print("amp higher ");      problemDetected = true; }
+    if (checkSoftAmpHigher()) { Serial.print("soft amp higher "); problemDetected = true; }
+    if (checkAmpLower())      { Serial.print("amp lower ");       problemDetected = true; }
+    if (checkVoltageHigher()) { Serial.print("voltage higher ");  problemDetected = true; }
+    if (checkVoltageLower())  { Serial.print("voltage lower ");   problemDetected = true; }
 
 
 
@@ -489,9 +493,26 @@ void mainCheck(){
 
   }// ##################checks only when in manual mode################## 
 
-  // ##################imporntant check that happens all the time################## 
+  // ################## check s all the time ################## 
 
-  // ##################imporntant check that happens all the time################## 
+  // ################## check all the time ################## 
+
+  // If any problem is detected, set the timeout
+  if (problemDetected) {
+    timeout = currentTime + timeoutDuration;
+    Serial.print("!problem");
+    working = false;
+  }
+  else {
+    if (currentTime >= timeout) {
+      Serial.print("working ");
+      working = true;
+    } else {
+      Serial.print(".");
+      //Serial.print("Waiting for timeout to expire. ");  
+    }
+  }
+
 }
 
 bool checkAmpHigher() {
